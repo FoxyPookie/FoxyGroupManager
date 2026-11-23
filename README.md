@@ -11,7 +11,7 @@ A modular Telegram group-management bot scaffold built with **Python 3.11**, **K
 ## Setup
 1. Copy `sample.env` to `.env` and fill in your credentials.
 2. Install dependencies: `pip install -r requirements.txt`
-3. Run: `python -m Yukki`
+3. Run: `python -m Foxy`
 
 ## Environment
 - `API_ID`, `API_HASH`, `BOT_TOKEN`
@@ -24,4 +24,4 @@ A modular Telegram group-management bot scaffold built with **Python 3.11**, **K
 - `/ping`
 - `/id`
 
-Plugins live in `Yukki/modules/` and are discovered automatically. Planned modules include moderation, welcome/button formatting, anti-spam, locks, filters, verification, logs, group settings and statistics.
+Plugins live in `Foxy/modules/` and are discovered automatically. Planned modules include moderation, welcome/button formatting, anti-spam, locks, filters, verification, logs, group settings and statistics.
