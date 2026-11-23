@@ -106,3 +106,4 @@ async def purge_from_command(client, message):
     try:
         await client.delete_messages(message.chat.id, confirmation.id)
     except RPCError:
+        pass
