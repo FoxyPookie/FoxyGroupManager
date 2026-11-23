@@ -40,36 +40,57 @@ async def captcha_toggle(client,message):
     await set_chat_settings(message.chat.id,captcha_enabled=enabled)
     return await message.reply_text(f"New-member captcha turned {'on' if enabled else 'off'}.")
 
-@app.on_message(filters.new_chat_members)
+@app.on_message(filters.group & filters.new_chat_members)
 async def new_members(client,message):
     if not message.chat or not _group(message):
         return
-    data=await get_chat_settings(message.chat.id)
-    for member in message.new_chat_members or []:
+    members=message.new_chat_members or []
+    if not members:
+        return
+    log.info("New-member event: chat=%s count=%d",message.chat.id,len(members))
+    try:
+        data=await get_chat_settings(message.chat.id)
+    except Exception:
+        log.exception("Failed reading group settings for new-member event")
+        return
+    welcome_enabled=bool(data.get("welcome_enabled",False))
+    captcha_enabled=bool(data.get("captcha_enabled",False))
+    log.info("New-member settings: welcome=%s captcha=%s chat=%s",welcome_enabled,captcha_enabled,message.chat.id)
+    for member in members:
         if member.is_bot:
             continue
-        if data.get("captcha_enabled",False):
+        if welcome_enabled:
             try:
-                await client.restrict_chat_member(message.chat.id,member.id,ChatPermissions(can_send_messages=False))
-            except Exception as e:
-                log.warning("Could not restrict new member %s in %s: %s",member.id,message.chat.id,e)
-                continue
-            a,b=random.randint(1,9),random.randint(1,9)
-            answer=a+b
-            _challenges[(message.chat.id,member.id)]=answer
-            buttons=[]
-            options=list({answer,answer+random.randint(1,3),answer-random.randint(1,3)})
-            while len(options)<3: options.append(answer+len(options))
-            random.shuffle(options)
-            buttons=[[InlineKeyboardButton(str(x),callback_data=f"foxcap:{message.chat.id}:{member.id}:{x}") for x in options]]
-            try:
-                await message.reply_text(
-                    f"Welcome, {member.mention}! 🦊\n\nSolve this to unlock chat access:\n**{a} + {b} = ?**",
-                    reply_markup=InlineKeyboardMarkup(buttons))
+                await message.reply_text(f"Welcome {member.mention} to **{message.chat.title}**! 🦊")
             except Exception:
-                log.exception("Failed to send captcha prompt")
-        elif data.get("welcome_enabled",False):
-            await message.reply_text(f"Welcome {member.mention} to **{message.chat.title}**! 🦊")
+                log.exception("Welcome message failed for chat %s member %s",message.chat.id,member.id)
+        if not captcha_enabled:
+            continue
+        try:
+            await client.restrict_chat_member(message.chat.id,member.id,ChatPermissions(can_send_messages=False))
+        except Exception:
+            log.exception("Captcha restrict failed; bot needs Restrict Members permission (chat=%s member=%s)",message.chat.id,member.id)
+            try:
+                await message.reply_text(f"⚠️ {member.mention}, captcha couldn't start because I lack permission to restrict members. Ask an admin to grant me **Restrict Members**.")
+            except Exception:
+                log.exception("Failed to send captcha permission warning")
+            continue
+        a,b=random.randint(1,9),random.randint(1,9)
+        answer=a+b
+        _challenges[(message.chat.id,member.id)]=answer
+        options={answer,answer+random.randint(1,3),max(1,answer-random.randint(1,3))}
+        while len(options)<3:
+            options.add(answer+len(options))
+        choices=list(options)
+        random.shuffle(choices)
+        buttons=[[InlineKeyboardButton(str(x),callback_data=f"foxcap:{message.chat.id}:{member.id}:{x}") for x in choices]]
+        try:
+            await message.reply_text(
+                f"Welcome, {member.mention}! 🦊\n\nSolve this to unlock chat access:\n**{a} + {b} = ?**",
+                reply_markup=InlineKeyboardMarkup(buttons))
+            log.info("Captcha prompt sent: chat=%s member=%s",message.chat.id,member.id)
+        except Exception:
+            log.exception("Failed to send captcha prompt")
 
 @app.on_callback_query(filters.regex(r"^foxcap:"))
 async def captcha_callback(client,query):
@@ -87,7 +108,7 @@ async def captcha_callback(client,query):
         return await query.answer("Wrong answer. Try another button.",show_alert=True)
     try:
         await client.restrict_chat_member(chat_id,user_id,ChatPermissions(can_send_messages=True))
-    except Exception as e:
+    except Exception:
         log.exception("Failed to unlock verified member")
         return await query.answer("Verification passed, but I couldn't restore chat permissions. Ask an admin.",show_alert=True)
     _challenges.pop((chat_id,user_id),None)
