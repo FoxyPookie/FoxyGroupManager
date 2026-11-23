@@ -1,0 +1,5 @@
+kurigram
+motor
+dnspython
+python-dotenv
+TgCrypto
