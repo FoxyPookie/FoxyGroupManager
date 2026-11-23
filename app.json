@@ -1,0 +1,52 @@
+{
+  "name": "FoxyGroupManager",
+  "description": "Foxy - Telegram group management bot",
+  "keywords": ["telegram", "bot", "group-management", "moderation"],
+  "repository": "https://github.com/FoxyPookie/FoxyGroupManager",
+  "stack": "heroku-24",
+  "buildpacks": [
+    {
+      "url": "heroku/python"
+    }
+  ],
+  "env": {
+    "API_ID": {
+      "description": "Telegram API ID from my.telegram.org",
+      "required": true
+    },
+    "API_HASH": {
+      "description": "Telegram API Hash from my.telegram.org",
+      "required": true
+    },
+    "BOT_TOKEN": {
+      "description": "Bot token from @BotFather",
+      "required": true
+    },
+    "MONGO_DB_URI": {
+      "description": "MongoDB connection URI (Atlas recommended)",
+      "required": true
+    },
+    "MONGO_DB_NAME": {
+      "description": "MongoDB database name",
+      "value": "FoxyGroup"
+    },
+    "OWNER_ID": {
+      "description": "Owner Telegram numeric ID",
+      "required": true
+    },
+    "SUDO_USERS": {
+      "description": "Optional space-separated sudo user IDs",
+      "value": ""
+    },
+    "LOG_GROUP_ID": {
+      "description": "Optional private logger chat ID",
+      "value": "0"
+    }
+  },
+  "formation": {
+    "worker": {
+      "quantity": 1,
+      "size": "eco"
+    }
+  }
+}
