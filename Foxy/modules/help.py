@@ -11,4 +11,4 @@ HELP_TEXT=(
 )
 @app.on_message(filters.command("help"))
 async def help_command(client,message):
-    await message.reply_text(HELP_TEXT,disable_web_page_preview=True)
+    await message.reply_text(HELP_TEXT)
