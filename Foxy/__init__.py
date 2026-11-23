@@ -18,6 +18,8 @@ async def init_database():
     await _db.chats.create_index("chat_id",unique=True)
     await _db.users.create_index("user_id",unique=True)
     await _db.settings.create_index("chat_id",unique=True)
+    await _db.temp_mutes.create_index([("chat_id",1),("user_id",1)],unique=True)
+    await _db.temp_mutes.create_index("expires_at")
     log.info("MongoDB connected; database=%s",config.MONGO_DB_NAME)
     return _db
 
