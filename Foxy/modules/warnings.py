@@ -64,7 +64,7 @@ async def warnings_command(client, message):
         lines.append(f"{i}. {item.get('reason','No reason')} — {when}")
     await message.reply_text("\n".join(lines))
 
-@app.on_message(filters.command("resetwarns"))
+@app.on_message(filters.command(["resetwarns", "resetwarning"]))
 async def resetwarns_command(client, message):
     if not await _prepare(client, message):
         return
