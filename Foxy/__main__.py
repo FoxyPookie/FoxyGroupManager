@@ -19,7 +19,6 @@ async def main():
 
     # Register all plugin handlers BEFORE starting the Telegram dispatcher.
     loaded = load_all()
-    from Foxy.utils import command_router  # noqa: F401 - register fallback dispatch
     log.info("Plugins registered before startup: %d (%s)", len(loaded), ", ".join(loaded))
 
     await app.start()
