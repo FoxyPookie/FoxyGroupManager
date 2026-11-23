@@ -4,6 +4,7 @@ from pyrogram.enums import ChatMemberStatus, ChatType
 from pyrogram.errors import RPCError
 import config
 from Foxy import app, get_db
+from Foxy.utils.permissions import _is_admin_status
 import logging
 log=logging.getLogger("Foxy.moderation")
 
@@ -14,7 +15,7 @@ async def _admin(client, message):
         return False
     try:
         member = await client.get_chat_member(message.chat.id, message.from_user.id)
-        return member.status in _ADMIN
+        return _is_admin_status(member.status)
     except RPCError:
         return False
 
@@ -22,7 +23,7 @@ async def _bot_admin(client, chat_id):
     try:
         me = await client.get_me()
         member = await client.get_chat_member(chat_id, me.id)
-        return member.status in _ADMIN
+        return _is_admin_status(member.status)
     except RPCError:
         return False
 
