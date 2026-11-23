@@ -1,1 +1,1 @@
-worker: python -m Yukki
+worker: python -m Foxy
