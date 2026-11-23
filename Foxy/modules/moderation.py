@@ -135,7 +135,7 @@ from pyrogram.types import ChatPermissions
 def _parse_duration(value):
     """Parse compact duration like 10m, 2h, 3d or 1w."""
     import re
-    match = re.fullmatch(r"(\\d+)([mhdw])", value.lower())
+    match = re.fullmatch(r"(\d+)([mhdw])", value.lower())
     if not match:
         return None
     amount = int(match.group(1))
