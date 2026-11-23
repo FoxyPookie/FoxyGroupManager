@@ -86,6 +86,7 @@ async def purge_command(client, message):
     try:
         await client.delete_messages(message.chat.id, confirmation.id)
     except RPCError:
+        pass
 
 @app.on_message(filters.command("purgefrom"))
 async def purge_from_command(client, message):
