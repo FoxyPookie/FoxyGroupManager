@@ -22,9 +22,10 @@ async def _allowed(client, message):
         if bot_member.status not in _ADMIN:
             await message.reply_text("I need administrator permission to delete messages.")
             return False
-        if not getattr(bot_member, "privileges", None) or not getattr(bot_member.privileges, "can_delete_messages", True):
-            # Older API wrappers may not expose the privilege object.
-            pass
+        privileges = getattr(bot_member, "privileges", None)
+        if privileges is not None and not getattr(privileges, "can_delete_messages", False):
+            await message.reply_text("I need the Delete Messages admin permission.")
+            return False
         return True
     except RPCError:
         await message.reply_text("Unable to verify permissions. Please check my admin rights.")
@@ -85,7 +86,6 @@ async def purge_command(client, message):
     try:
         await client.delete_messages(message.chat.id, confirmation.id)
     except RPCError:
-        pass
 
 @app.on_message(filters.command("purgefrom"))
 async def purge_from_command(client, message):
@@ -105,4 +105,3 @@ async def purge_from_command(client, message):
     try:
         await client.delete_messages(message.chat.id, confirmation.id)
     except RPCError:
-        pass
