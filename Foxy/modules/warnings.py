@@ -72,4 +72,4 @@ async def resetwarns_command(client, message):
     if error:
         return await message.reply_text(error)
     result = await get_db().warnings.delete_one({"chat_id": message.chat.id, "user_id": user.id})
-    await message.reply_text(f"Warnings reset for {user.mention}. Removed {len((result.deleted_count,)) if result.deleted_count else 0} warning record(s).")
+    await message.reply_text(f"Warnings reset for {user.mention}. Warning history cleared.")
