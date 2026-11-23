@@ -12,7 +12,7 @@ from Foxy import app, get_db
 from Foxy.database import get_chat_settings
 
 ADMIN=(ChatMemberStatus.OWNER,ChatMemberStatus.ADMINISTRATOR)
-URL_RE=re.compile(r"(https?://|www\\.|t\\.me/|telegram\\.me/)",re.I)
+URL_RE=re.compile(r"(https?://|www\.|t\.me/|telegram\.me/)",re.I)
 _flood=defaultdict(lambda: deque())
 _joins=defaultdict(lambda: deque())
 _RAID_WINDOW=30
@@ -33,7 +33,8 @@ async def _toggle(client,message,key):
         return await message.reply_text("Only group administrators can change security settings.")
     parts=(message.text or "").split(maxsplit=1)
     if len(parts)<2 or parts[1].lower() not in ("on","off"):
-        return await message.reply_text(f"Usage: /{key.replace('_enabled","")} on or off")
+        command = {"antiflood_enabled":"antiflood","antilink_enabled":"antilink","antiraid_enabled":"antiraid"}[key]
+        return await message.reply_text(f"Usage: /{command} on or off")
     enabled=parts[1].lower()=="on"
     await get_db().settings.update_one({"chat_id":message.chat.id},{"$set":{key:enabled,"updated_at":datetime.now(timezone.utc)},"$setOnInsert":{"chat_id":message.chat.id}},upsert=True)
     await message.reply_text(f"🛡️ {key.replace('_enabled','').replace('_',' ').title()} is now **{'ON' if enabled else 'OFF'}**.")
