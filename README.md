@@ -9,7 +9,7 @@ A modular Telegram group-management bot built with Python 3.11, Kurigram (Pyrogr
 1. Click the **Deploy to Heroku** button above.
 2. Fill in the required Telegram and MongoDB config vars.
 3. Choose an app name and deploy.
-4. After deployment, open **Resources** and make sure the `worker` dyno is enabled (one worker).
+4. Open **Resources** and add/enable the `worker` process from the Procfile. Heroku may require an Eco subscription to run a worker dyno; the manifest intentionally does not auto-scale dynos.
 5. View **More → View logs** to confirm startup.
 
 The included `Procfile` runs `python -m Foxy`. `runtime.txt` pins Python 3.11.10 for Heroku builds.
