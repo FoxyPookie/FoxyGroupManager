@@ -37,7 +37,7 @@ async def _delete_ids(client, chat_id, ids):
         chunk = ids[offset:offset + 100]
         try:
             result = await client.delete_messages(chat_id, chunk)
-            deleted += int(result or len(chunk))
+            deleted += len(chunk) if result else 0
         except RPCError:
             # Attempt individually to avoid losing an entire batch to one old message.
             for message_id in chunk:
